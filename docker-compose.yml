@@ -1,0 +1,66 @@
+version: '3'
+
+services:
+
+#  This API TODO: uncomment when this api already
+#  api-bff-ms-hr-system:
+#    build:
+#      dockerfile: Dockerfile
+#      context: .
+#    container_name: api-bff-ms-hr-system
+#    environment:
+#      SERVER_PORT: 9090
+#    ports:
+#      - "9090:9090"
+#    depends_on:
+#      - api-hr-user
+#      - api-hr-worker
+
+  # external apis
+  api-hr-user:
+    image: matheuscarv69/ms-hr-user:latest
+    container_name: api-hr-user
+    environment:
+      SERVER_PORT: 9000
+      POSTGRES_HOST: postgres-hr-user:5432
+      DB_USER: postgres
+      DB_PASSWORD: password
+      DB_SCHEMA: hr_user
+    ports:
+      - "9000:9000"
+    depends_on:
+      - postgres-hr-user
+
+  api-hr-worker:
+    image: matheuscarv69/ms-hr-worker:latest
+    container_name: api-hr-worker
+    environment:
+      SERVER_PORT: 9010
+      POSTGRES_HOST: postgres-hr-worker:5432
+      DB_USER: postgres
+      DB_PASSWORD: password
+      DB_SCHEMA: hr_worker
+    ports:
+      - "9010:9010"
+    depends_on:
+      - api-hr-user
+      - postgres-hr-worker
+
+  # databases
+  postgres-hr-user:
+    image: 'postgres:alpine'
+    container_name: postgres-hr-user
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+
+  postgres-hr-worker:
+    image: 'postgres:alpine'
+    container_name: postgres-hr-worker
+    ports:
+      - "5440:5432"
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password

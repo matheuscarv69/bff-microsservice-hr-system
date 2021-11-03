@@ -4,9 +4,9 @@ import feign.FeignException
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Component
+import src.configs.exceptions.ExternalTimeoutException
 import src.core.clients.hruser.HRUserClient
 import src.core.clients.hruser.exceptions.HrUserEmailAlreadyExistsException
-import src.core.clients.hruser.exceptions.HrUserTimeoutException
 import src.core.clients.hruser.request.NewUserHRUserRequest
 
 @Component
@@ -36,7 +36,7 @@ class HRUserAdapter(
                             throw HrUserEmailAlreadyExistsException()
                     }
                 }
-                500 -> throw HrUserTimeoutException()
+                500 -> throw ExternalTimeoutException("HR User")
 
             }
 

@@ -9,7 +9,6 @@ import org.springframework.web.bind.annotation.ExceptionHandler
 import org.springframework.web.bind.annotation.ResponseStatus
 import org.springframework.web.bind.annotation.RestControllerAdvice
 import src.core.clients.hruser.exceptions.HrUserEmailAlreadyExistsException
-import src.core.clients.hruser.exceptions.HrUserTimeoutException
 import java.time.LocalDateTime
 import javax.servlet.http.HttpServletRequest
 
@@ -79,13 +78,13 @@ class ExceptionHandlerAdvice(private val messageSource: MessageSource) {
     )
 
     /**
-     * Handle for hr user errors
+     * Handle for External errors
      * return HttpStatus 504 - GATEWAY TIMEOUT
      * */
     @ResponseStatus(code = HttpStatus.GATEWAY_TIMEOUT)
-    @ExceptionHandler(HrUserTimeoutException::class)
-    fun handleHrUserTimeoutException(
-        exception: HrUserTimeoutException,
+    @ExceptionHandler(ExternalTimeoutException::class)
+    fun handleExternalTimeoutException(
+        exception: ExternalTimeoutException,
         request: HttpServletRequest
     ) = ExceptionResponse(
         status = HttpStatus.GATEWAY_TIMEOUT.value(),

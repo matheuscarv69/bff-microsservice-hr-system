@@ -8,6 +8,8 @@ import org.springframework.web.bind.MethodArgumentNotValidException
 import org.springframework.web.bind.annotation.ExceptionHandler
 import org.springframework.web.bind.annotation.ResponseStatus
 import org.springframework.web.bind.annotation.RestControllerAdvice
+import src.core.clients.hruser.exceptions.HrUserEmailAlreadyExistsException
+import src.core.clients.hruser.exceptions.HrUserTimeoutException
 import java.time.LocalDateTime
 import javax.servlet.http.HttpServletRequest
 
@@ -58,6 +60,40 @@ class ExceptionHandlerAdvice(private val messageSource: MessageSource) {
             path = request.servletPath
         )
     }
+
+    /**
+     * Handle for hr user validation errors
+     * return HttpStatus 400 - BAD REQUEST
+     * */
+    @ResponseStatus(code = HttpStatus.BAD_REQUEST)
+    @ExceptionHandler(HrUserEmailAlreadyExistsException::class)
+    fun handleHrUserEmailAlreadyExistsException(
+        exception: HrUserEmailAlreadyExistsException,
+        request: HttpServletRequest
+    ) = ExceptionResponse(
+        status = HttpStatus.BAD_REQUEST.value(),
+        error = HttpStatus.BAD_REQUEST.name,
+        field = "email",
+        message = exception.message!!,
+        path = request.servletPath
+    )
+
+    /**
+     * Handle for hr user errors
+     * return HttpStatus 504 - GATEWAY TIMEOUT
+     * */
+    @ResponseStatus(code = HttpStatus.GATEWAY_TIMEOUT)
+    @ExceptionHandler(HrUserTimeoutException::class)
+    fun handleHrUserTimeoutException(
+        exception: HrUserTimeoutException,
+        request: HttpServletRequest
+    ) = ExceptionResponse(
+        status = HttpStatus.GATEWAY_TIMEOUT.value(),
+        error = HttpStatus.GATEWAY_TIMEOUT.name,
+        field = "",
+        message = exception.message!!,
+        path = request.servletPath
+    )
 
 }
 

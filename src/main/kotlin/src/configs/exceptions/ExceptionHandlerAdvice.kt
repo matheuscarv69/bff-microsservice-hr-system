@@ -15,22 +15,22 @@ import javax.servlet.http.HttpServletRequest
 @RestControllerAdvice
 class ExceptionHandlerAdvice(private val messageSource: MessageSource) {
 
-    /**
-     * Handle for application's errors
-     * return HttpStatus 500 - INTERNAL SERVER ERROR
-     * */
-    @ResponseStatus(code = HttpStatus.INTERNAL_SERVER_ERROR)
-    @ExceptionHandler(Exception::class)
-    fun handleServerErrorException(
-        exception: Exception,
-        request: HttpServletRequest
-    ) = ExceptionResponse(
-        status = HttpStatus.INTERNAL_SERVER_ERROR.value(),
-        error = HttpStatus.INTERNAL_SERVER_ERROR.name,
-        field = "",
-        message = exception.message!!,
-        path = request.servletPath
-    )
+//    /**
+//     * Handle for application's errors
+//     * return HttpStatus 500 - INTERNAL SERVER ERROR
+//     * */
+//    @ResponseStatus(code = HttpStatus.INTERNAL_SERVER_ERROR)
+//    @ExceptionHandler(Exception::class)
+//    fun handleServerErrorException(
+//        exception: Exception,
+//        request: HttpServletRequest
+//    ) = ExceptionResponse(
+//        status = HttpStatus.INTERNAL_SERVER_ERROR.value(),
+//        error = HttpStatus.INTERNAL_SERVER_ERROR.name,
+//        field = "",
+//        message = exception.message!!,
+//        path = request.servletPath
+//    )
 
     /**
      * Handle for validations errors
@@ -89,6 +89,23 @@ class ExceptionHandlerAdvice(private val messageSource: MessageSource) {
     ) = ExceptionResponse(
         status = HttpStatus.GATEWAY_TIMEOUT.value(),
         error = HttpStatus.GATEWAY_TIMEOUT.name,
+        field = "",
+        message = exception.message!!,
+        path = request.servletPath
+    )
+
+    /**
+     * Handle for User Not Found
+     * return HttpStatus 404 - NOT FOUND
+     * */
+    @ResponseStatus(code = HttpStatus.NOT_FOUND)
+    @ExceptionHandler(ExternalUserNotFoundException::class)
+    fun handleExternalUserNotFoundException(
+        exception: ExternalUserNotFoundException,
+        request: HttpServletRequest
+    ) = ExceptionResponse(
+        status = HttpStatus.NOT_FOUND.value(),
+        error = HttpStatus.NOT_FOUND.name,
         field = "",
         message = exception.message!!,
         path = request.servletPath

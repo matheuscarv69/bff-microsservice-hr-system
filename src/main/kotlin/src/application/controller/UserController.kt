@@ -11,7 +11,9 @@ import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.util.UriComponentsBuilder
 import src.application.request.NewUserRequest
+import src.application.response.DetailUserResponse
 import src.domain.usecase.CreateUserUseCase
+import src.domain.usecase.GetUserUseCase
 import javax.validation.Valid
 
 @Api(tags = ["User"])
@@ -19,7 +21,10 @@ import javax.validation.Valid
 @RequestMapping("/v1/users")
 class UserController(
     @Autowired
-    private val createUserService: CreateUserUseCase
+    private val createUserService: CreateUserUseCase,
+
+    @Autowired
+    private val getUserService: GetUserUseCase
 ) {
 
     private val log = LoggerFactory.getLogger(this.javaClass)
@@ -46,6 +51,27 @@ class UserController(
         val uri = uriBuilder.path("/v1/users/{userId}").buildAndExpand(userId).toUri()
 
         return ResponseEntity.created(uri).build()
+    }
+
+    @ApiOperation("Get User by ID")
+    @ApiResponses(
+        value = [
+            ApiResponse(code = 200, message = "User found successfully"),
+            ApiResponse(code = 404, message = "User Not Found"),
+            ApiResponse(code = 500, message = "Internal Server Error"),
+            ApiResponse(code = 504, message = "Gateway Timeout")
+        ]
+    )
+    @ResponseStatus(HttpStatus.OK)
+    @GetMapping("/{userId}")
+    fun getUserById(
+        @PathVariable userId: Long
+    ): ResponseEntity<DetailUserResponse> {
+        log.info("Receiving request for found user, id: $userId")
+
+        val response = getUserService.getUserById(userId)
+
+        return ResponseEntity.ok(DetailUserResponse(response))
     }
 
 

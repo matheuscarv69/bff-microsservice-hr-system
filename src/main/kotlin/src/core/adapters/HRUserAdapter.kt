@@ -5,9 +5,11 @@ import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Component
 import src.configs.exceptions.ExternalTimeoutException
+import src.configs.exceptions.ExternalUserNotFoundException
 import src.core.clients.hruser.HRUserClient
 import src.core.clients.hruser.exceptions.HrUserEmailAlreadyExistsException
 import src.core.clients.hruser.request.NewUserHRUserRequest
+import src.core.clients.hruser.response.DetailUserHRUserResponse
 
 @Component
 class HRUserAdapter(
@@ -15,10 +17,15 @@ class HRUserAdapter(
     private val hrUserClient: HRUserClient
 ) {
 
+    companion object {
+        const val ERROR_INTEGRATION: String = "Error hr-user integration"
+        const val MS_NAME: String = "HR-User"
+    }
+
     private val log = LoggerFactory.getLogger(this.javaClass)
 
     fun createUser(request: NewUserHRUserRequest): Long {
-        log.info("Sending request for create user in HR-User")
+        log.info("Sending request for create user in $MS_NAME")
 
         try {
             val response = hrUserClient.createUser(request)
@@ -27,7 +34,7 @@ class HRUserAdapter(
 
             return userId
         } catch (exception: FeignException) {
-            log.warn("Error hr-user integration")
+            log.warn(ERROR_INTEGRATION)
 
             when (exception.status()) {
                 400 -> {
@@ -36,14 +43,33 @@ class HRUserAdapter(
                             throw HrUserEmailAlreadyExistsException()
                     }
                 }
-                500 -> throw ExternalTimeoutException("HR User")
+                500 -> throw ExternalTimeoutException(MS_NAME)
 
             }
 
-            throw RuntimeException("Error hr-user integration")
+            throw RuntimeException(ERROR_INTEGRATION)
         }
 
     }
 
+    fun getUserById(userId: Long): DetailUserHRUserResponse {
+        log.info("Sending request for Get User by ID: $userId in $MS_NAME")
+
+        try {
+            val response = hrUserClient.getUserById(userId)
+
+            return response.body!!
+        } catch (exception: FeignException) {
+            log.warn(ERROR_INTEGRATION)
+
+            when (exception.status()) {
+                404 -> throw ExternalUserNotFoundException(MS_NAME)
+                500 -> throw ExternalTimeoutException(MS_NAME)
+            }
+
+            throw RuntimeException(ERROR_INTEGRATION)
+        }
+
+    }
 
 }

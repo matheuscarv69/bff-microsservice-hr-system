@@ -2,23 +2,23 @@ version: '3'
 
 services:
 
-#  This API TODO: uncomment when this api already
-#  api-bff-ms-hr-system:
-#    build:
-#      dockerfile: Dockerfile
-#      context: .
-#    container_name: api-bff-ms-hr-system
-#    environment:
-#      SERVER_PORT: 9090
-#    ports:
-#      - "9090:9090"
-#    depends_on:
-#      - api-hr-user
-#      - api-hr-worker
+  #  This API TODO: uncomment when this api already
+  #  api-bff-ms-hr-system:
+  #    build:
+  #      dockerfile: Dockerfile
+  #      context: .
+  #    container_name: api-bff-ms-hr-system
+  #    environment:
+  #      SERVER_PORT: 9090
+  #    ports:
+  #      - "9090:9090"
+  #    depends_on:
+  #      - api-hr-user
+  #      - api-hr-worker
 
   # external apis
   api-hr-user:
-    image: matheuscarv69/ms-hr-user:latest
+    image: matheuscarv69/ms-hr-user:arm64
     container_name: api-hr-user
     environment:
       SERVER_PORT: 9000
@@ -32,7 +32,7 @@ services:
       - postgres-hr-user
 
   api-hr-worker:
-    image: matheuscarv69/ms-hr-worker:latest
+    image: matheuscarv69/ms-hr-worker:arm64
     container_name: api-hr-worker
     environment:
       SERVER_PORT: 9010
@@ -45,6 +45,21 @@ services:
     depends_on:
       - api-hr-user
       - postgres-hr-worker
+
+  api-hr-payroll:
+    image: matheuscarv69/ms-hr-payroll:arm64
+    container_name: api-hr-payroll
+    environment:
+      SERVER_PORT: 9020
+      POSTGRES_HOST: postgres_hr-payroll:5432
+      DB_USER: postgres
+      DB_PASSWORD: password
+      DB_SCHEMA: hr_payroll
+    ports:
+      - "9020:9020"
+    depends_on:
+      - api-hr-user
+      - postgres_hr-payroll
 
   # databases
   postgres-hr-user:
@@ -61,6 +76,15 @@ services:
     container_name: postgres-hr-worker
     ports:
       - "5440:5432"
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+
+  postgres_hr-payroll:
+    image: 'postgres:alpine'
+    container_name: postgres_hr-payroll
+    ports:
+      - "5450:5432"
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: password

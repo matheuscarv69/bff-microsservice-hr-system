@@ -18,7 +18,7 @@ services:
 
   # external apis
   api-hr-user:
-    image: matheuscarv69/ms-hr-user:latest
+    image: matheuscarv69/ms-hr-user:arm64
     container_name: api-hr-user
     environment:
       SERVER_PORT: 9000
@@ -32,7 +32,7 @@ services:
       - postgres-hr-user
 
   api-hr-worker:
-    image: matheuscarv69/ms-hr-worker:latest
+    image: matheuscarv69/ms-hr-worker:arm64
     container_name: api-hr-worker
     environment:
       SERVER_PORT: 9010
@@ -47,7 +47,7 @@ services:
       - postgres-hr-worker
 
   api-hr-payroll:
-    image: matheuscarv69/ms-hr-payroll:latest
+    image: matheuscarv69/ms-hr-payroll:arm64
     container_name: api-hr-payroll
     environment:
       SERVER_PORT: 9020
